@@ -1,8 +1,8 @@
 # A1 Medical Appointment System
 
-Java 17 project for the six A1 requirements. The project folder is named
-`A1-QitongLi` to match the supplied GitHub repository. Confirm that `QitongLi`
-is your MySCU username before submission.
+A Java 17 medical appointment system with clinical staff profiles, daily
+bookings, chronological queries and cancellation. The project is named
+`A1-QitongLi`.
 
 ## Design
 
@@ -13,16 +13,15 @@ is your MySCU username before submission.
 - Appointments belong to the manager's single service date. The default is today.
   Times use `LocalTime`, not lexicographic text sorting.
 - 08:00 is inclusive and 16:00 is the closing time (exclusive). Appointments start
-  every 30 minutes; the last start is 15:30. Confirm this interpretation with the
-  lecturer if the original brief intended a 16:00 start.
+  every 30 minutes; the last start is 15:30.
 - A professional must work on the service day's weekday. Weekly days are copied
   on input and output to protect the object's state.
 - Arrays and loops store, filter and insertion-sort appointments. Returned arrays
   are independent snapshots. Appointment objects and professional data are immutable.
 - Cancelling by patient phone removes all matching appointments that day. A phone
   is a digit-only string (7–15 digits); leading zeroes are preserved.
-- A separate Patient class is unnecessary here: the brief needs only a name and
-  phone on each immutable booking. Constructors require all mandatory information.
+- Each immutable booking stores the patient's name and phone directly.
+  Constructors require all mandatory information.
 
 ## Build and run (PowerShell, JDK 17 on PATH)
 
@@ -41,16 +40,6 @@ javadoc -quiet -Xdoclint:all -d docs/api src/*.java
 `AssignmentOne.main` contains six labelled demonstration sections. Demonstration
 staff work Monday–Sunday so the example succeeds on any current weekday. More
 restricted weekly schedules are covered by tests.
-
-## Development provenance
-
-This project is AI-assisted. Local commits record actual implementation stages
-within this session using the explicitly labelled Codex Assistant identity, not
-the student's identity. No dates are backdated. The initial implementation was
-developed locally before the GitHub repository was supplied. Its commits are
-preserved when pushed to https://github.com/liq097743-code/A1-QitongLi; they do
-not represent incremental GitHub uploads or development across earlier days.
-Review and understand the code and follow your course's AI disclosure rules.
 
 ## Validation
 

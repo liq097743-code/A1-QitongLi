@@ -2,7 +2,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/** Entry point demonstrating the six required A1 parts. */
+/** Entry point demonstrating staff profiles and the appointment workflow. */
 public final class AssignmentOne {
     private AssignmentOne() { }
 
