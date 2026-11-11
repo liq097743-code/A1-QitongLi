@@ -1,7 +1,8 @@
 # A1 Medical Appointment System
 
-Java 17 project for the six A1 requirements. Replace `MySCUUsername` in the
-folder name with your actual MySCU username before submission.
+Java 17 project for the six A1 requirements. The project folder is named
+`A1-QitongLi` to match the supplied GitHub repository. Confirm that `QitongLi`
+is your MySCU username before submission.
 
 ## Design
 
@@ -45,8 +46,10 @@ restricted weekly schedules are covered by tests.
 
 This project is AI-assisted. Local commits record actual implementation stages
 within this session using the explicitly labelled Codex Assistant identity, not
-the student's identity. No dates are backdated. No GitHub repository was supplied,
-so local history is not evidence of ongoing GitHub development across earlier days.
+the student's identity. No dates are backdated. The initial implementation was
+developed locally before the GitHub repository was supplied. Its commits are
+preserved when pushed to https://github.com/liq097743-code/A1-QitongLi; they do
+not represent incremental GitHub uploads or development across earlier days.
 Review and understand the code and follow your course's AI disclosure rules.
 
 ## Validation
