@@ -25,6 +25,10 @@ folder name with your actual MySCU username before submission.
 
 ## Build and run (PowerShell, JDK 17 on PATH)
 
+On this computer, run `powershell -ExecutionPolicy Bypass -File ./run.ps1` for the
+demonstration, or add `-Test` for the regression checks. The script also detects
+the portable JDK installed under `%LOCALAPPDATA%/CodexJava` during development.
+
 ```powershell
 New-Item -ItemType Directory -Force out | Out-Null
 javac -encoding UTF-8 -Xlint:all -d out src/*.java tests/*.java
@@ -44,3 +48,11 @@ within this session using the explicitly labelled Codex Assistant identity, not
 the student's identity. No dates are backdated. No GitHub repository was supplied,
 so local history is not evidence of ongoing GitHub development across earlier days.
 Review and understand the code and follow your course's AI disclosure rules.
+
+## Validation
+
+Compiled with Java 17 using `-Xlint:all`; all 74 regression checks passed.
+Javadoc generated successfully with `-Xdoclint:all`. `demo-output.txt` contains
+the actual demonstration output from development. The tests cover both time
+boundaries, invalid fields, off-duty staff, identity, conflicts, filtering,
+sorting, cancellation, defensive copying and array growth.

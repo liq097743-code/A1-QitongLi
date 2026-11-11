@@ -1,0 +1,65 @@
+
+PART 1 - Common staff information
+ID: 101, name: Alex Chen
+
+PART 2 - Four clinical roles
+Created 4 types of clinical staff.
+
+PART 3 - Polymorphic staff display
+Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+Staff 102 | Sam Lee | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Dentist | Dental specialty: Orthodontics
+Staff 103 | Robin Tan | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Physiotherapist | Therapy approach: Sports rehabilitation
+Staff 104 | Jamie Wu | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Nurse | Clinical qualification: Registered nurse
+
+PART 4 - Create appointments for today
+2026-11-11 14:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+
+PART 5 - Manage appointments
+ADDED: 2026-11-11 14:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+ADDED: 2026-11-11 08:00 | Patient: Morgan | Phone: 0400000002 | Staff 102 | Sam Lee | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Dentist | Dental specialty: Orthodontics
+ADDED: 2026-11-11 09:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+ADDED: 2026-11-11 08:00 | Patient: Casey | Phone: 0400000003 | Staff 103 | Robin Tan | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Physiotherapist | Therapy approach: Sports rehabilitation
+ADDED: 2026-11-11 15:30 | Patient: Jordan | Phone: 0400000004 | Staff 104 | Jamie Wu | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Nurse | Clinical qualification: Registered nurse
+
+All bookings sorted by time (5)
+2026-11-11 08:00 | Patient: Morgan | Phone: 0400000002 | Staff 102 | Sam Lee | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Dentist | Dental specialty: Orthodontics
+2026-11-11 08:00 | Patient: Casey | Phone: 0400000003 | Staff 103 | Robin Tan | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Physiotherapist | Therapy approach: Sports rehabilitation
+2026-11-11 09:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+2026-11-11 14:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+2026-11-11 15:30 | Patient: Jordan | Phone: 0400000004 | Staff 104 | Jamie Wu | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Nurse | Clinical qualification: Registered nurse
+
+Staff 101 sorted by time (2)
+2026-11-11 09:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+2026-11-11 14:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+
+Patient 0400000001 sorted by time (2)
+2026-11-11 09:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+2026-11-11 14:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+CANCELLED: staff 102 at 08:00
+
+After staff/time cancellation (4)
+2026-11-11 08:00 | Patient: Casey | Phone: 0400000003 | Staff 103 | Robin Tan | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Physiotherapist | Therapy approach: Sports rehabilitation
+2026-11-11 09:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+2026-11-11 14:00 | Patient: Taylor | Phone: 0400000001 | Staff 101 | Alex Chen | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | General practitioner | Practice focus: Family medicine
+2026-11-11 15:30 | Patient: Jordan | Phone: 0400000004 | Staff 104 | Jamie Wu | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Nurse | Clinical qualification: Registered nurse
+CANCELLED: 2 appointment(s) for 0400000001
+
+After phone cancellation (2)
+2026-11-11 08:00 | Patient: Casey | Phone: 0400000003 | Staff 103 | Robin Tan | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Physiotherapist | Therapy approach: Sports rehabilitation
+2026-11-11 15:30 | Patient: Jordan | Phone: 0400000004 | Staff 104 | Jamie Wu | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Nurse | Clinical qualification: Registered nurse
+
+PART 6 - Error handling
+Separate objects, same staff identity: true
+WARNING: Duplicate booking for staff 103 at 08:00
+WARNING: Only appointments for 2026-11-11 are accepted.
+WARNING: Appointment is required.
+WARNING: No booking for staff 999 at 10:00
+WARNING: No appointments for patient phone 0499999999
+WARNING: Patient name is required.
+WARNING: Use a 30-minute slot from 08:00 to 15:30; closes at 16:00.
+WARNING: Patient phone must contain 7 to 15 digits.
+WARNING: Staff ID must contain digits only.
+
+Final bookings after failed operations (2)
+2026-11-11 08:00 | Patient: Casey | Phone: 0400000003 | Staff 103 | Robin Tan | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Physiotherapist | Therapy approach: Sports rehabilitation
+2026-11-11 15:30 | Patient: Jordan | Phone: 0400000004 | Staff 104 | Jamie Wu | Days: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY] | Nurse | Clinical qualification: Registered nurse
