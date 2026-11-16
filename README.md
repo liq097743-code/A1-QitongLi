@@ -1,53 +1,54 @@
-# A1 Medical Appointment System
-
-Java 17 console application. Main entry point: src/AssignmentOne.java.
+# A1 Medical Appointment System — Interactive Java Version
 
 ## Run in VS Code
 
-1. Install JDK 17 and the Microsoft Extension Pack for Java in VS Code.
-2. Open this project folder in VS Code and trust it if prompted.
-3. Open src/AssignmentOne.java.
-4. Click Run above the main method to display the six-part console demo.
+Open this folder in VS Code. With JDK 17, Language Support for Java by Red Hat and Debugger for Java installed, open
+src/AssignmentOne.java and select Run above main. Click inside the TERMINAL panel,
+type a menu number, then press Enter. Input cannot be entered in the Output panel.
+If VS Code asks for a console, choose the integrated terminal.
 
-The demo runs automatically; it does not prompt for keyboard input.
-To run regression checks, open tests/AppointmentSystemTest.java and run its main method.
-## Design
+The program starts with no appointments. Each prompt expects one line of input.
+Invalid input prints a warning and returns to the menu. Select 0 to exit.
+Appointments are held in memory for this session and are not saved after exit.
 
-- MedicalProfessional is abstract. Its private fields and defensive weekly schedule
-  copies protect identity and availability. Four concrete clinical roles implement
-  roleDetails. Three general practitioners and three other professionals are displayed.
-- Patient has private name/mobilePhone fields and validated getters/setters.
-  Appointment takes defensive patient snapshots so later contact changes cannot
-  silently change booking queries or cancellation keys.
-- Appointment stores numeric minutes since midnight and implements Comparable.
-  LocalDate, LocalTime and DayOfWeek remain as date/time boundary types.
-- ClinicSchedule centralizes opening, closing and interval constants. Opening is
-  inclusive; closing is exclusive. Current slots run from 08:00 through 15:30.
-- AppointmentManager can only be constructed for today and rejects other dates.
-  A manager left open past midnight rejects new bookings; create a new one for today.
-- Standard Collections.sort sorts independent query results, including filtered
-  results. Booking storage uses a dynamically expanded array.
-- Staff identity uses numeric strings, normalizing leading zeroes. Phone numbers
-  preserve zeroes and require 7 to 15 digits. Cancelling by phone removes all matches.
-- Staff and bookings intentionally have no mutation setters: changing identity,
-  time or availability after registration could invalidate existing bookings.
-  Create replacement objects and cancel/rebook instead.
-- The source uses no Lambda, Stream, GUI or Java file IO. Tests also use ordinary
-  try/catch instead of Lambda or Runnable.
+## Menu
 
-## Verification
+1. View staff and today's availability.
+2. Add a booking: patient name, phone, staff ID, and HH:mm start time.
+3. List all bookings in chronological order.
+4. Filter by staff ID, preserving chronological order.
+5. Filter by patient phone, preserving chronological order.
+6. Cancel one booking by staff ID and start time.
+7. Cancel all bookings for a patient phone.
+0. Exit and display the final bookings.
 
-84 regression checks passed, including patient snapshots, invalid setter atomicity,
-invalid filters, staff identity, slot boundaries, working days, sorting, cancellation
-and storage growth. Compilation with -Xlint:all and Javadoc with -Xdoclint:all pass.
-Run AssignmentOne to display the six-part console demo.
+Example: choose 2, then enter Taylor, 0400000001, 101 and 09:00 on separate lines.
+Choose 3 to view the booking. Repeat the same booking to see a duplicate warning.
 
-With JDK 17 on PATH:
+## Business rules and design
 
-```text
+Only today's appointments are accepted. Slots start every 30 minutes from 08:00
+through 15:30; the clinic closes at 16:00. One professional cannot have two bookings
+at the same time. Different professionals may share a time slot. Weekly working days
+are validated. IDs contain digits and normalize leading zeroes; phones contain 7–15
+digits and preserve leading zeroes.
+
+MedicalProfessional is abstract, with private fields and defensive schedule copies.
+Its four subclasses supply role-specific information. Patient validates mutable
+contact details; Appointment stores a defensive snapshot and numeric minutes.
+AppointmentManager handles storage, queries, standard sorting and cancellations.
+AssignmentOne handles the console menu and input only. English Javadoc and inline
+comments explain the design. No HTML or JavaScript is required.
+
+## Compile and test with JDK 17
+
 javac -encoding UTF-8 -Xlint:all -d out src/*.java tests/*.java
 java -cp out AssignmentOne
 java -cp out AppointmentSystemTest
-javadoc -quiet -Xdoclint:all -d docs/api src/*.java
-```
+
+The original 84 model checks are retained. The interactive entry point replaces the
+previous automatic demonstration. Existing slides about automatically loading five
+bookings do not describe this version's startup; enter the demonstration data first.
+
+The .vscode folder identifies src/tests as source folders and configures an integrated terminal. Use Run and Debug > Run A1 - Interactive Menu, or press Ctrl+F5. Wait for Java project import to finish first.
 

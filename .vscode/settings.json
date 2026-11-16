@@ -1,0 +1,5 @@
+{
+  "java.project.sourcePaths": ["src", "tests"],
+  "java.project.outputPath": "out",
+  "java.debug.settings.console": "integratedTerminal"
+}
