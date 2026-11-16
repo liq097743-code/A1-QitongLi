@@ -3,10 +3,9 @@ import java.time.LocalTime;
 
 /** Immutable, comparable booking for one patient and one professional. */
 public final class Appointment implements Comparable<Appointment> {
-    private final String patientName;
-    private final String patientPhone;
+    private final Patient patient;
     private final LocalDate date;
-    private final LocalTime time;
+    private final int timeSlotMinutes;
     private final MedicalProfessional professional;
 
     /**
@@ -20,8 +19,21 @@ public final class Appointment implements Comparable<Appointment> {
      */
     public Appointment(String patientName, String patientPhone, LocalDate date,
             LocalTime time, MedicalProfessional professional) {
-        this.patientName = MedicalProfessional.requireText(patientName, "Patient name");
-        this.patientPhone = validatePhone(patientPhone);
+        this(new Patient(patientName, patientPhone), date, time, professional);
+    }
+
+    /**
+     * Creates a booking from a defensive snapshot of patient contact details.
+     * @param patient required patient
+     * @param date booking date
+     * @param time valid slot start
+     * @param professional chosen professional
+     * @throws IllegalArgumentException if required information is invalid
+     */
+    public Appointment(Patient patient, LocalDate date, LocalTime time,
+            MedicalProfessional professional) {
+        if (patient == null) { throw new IllegalArgumentException("Patient is required."); }
+        this.patient = new Patient(patient.getName(), patient.getMobilePhone());
         if (date == null || professional == null) {
             throw new IllegalArgumentException("Date and medical professional are required.");
         }
@@ -31,18 +43,22 @@ public final class Appointment implements Comparable<Appointment> {
                     + date.getDayOfWeek() + ".");
         }
         this.date = date;
-        this.time = time;
+        this.timeSlotMinutes = time.getHour() * 60 + time.getMinute();
         this.professional = professional;
     }
 
     /** @return patient name */
-    public String getPatientName() { return patientName; }
+    public String getPatientName() { return patient.getName(); }
     /** @return phone with leading zeroes preserved */
-    public String getPatientPhone() { return patientPhone; }
+    public String getPatientPhone() { return patient.getMobilePhone(); }
+    /** @return independent patient details, protecting stored bookings */
+    public Patient getPatient() { return new Patient(patient.getName(), patient.getMobilePhone()); }
+    /** @return numeric minutes since midnight used for ordering */
+    public int getTimeSlotMinutes() { return timeSlotMinutes; }
     /** @return booking date */
     public LocalDate getDate() { return date; }
     /** @return chronological booking time */
-    public LocalTime getTime() { return time; }
+    public LocalTime getTime() { return LocalTime.of(timeSlotMinutes / 60, timeSlotMinutes % 60); }
     /** @return immutable professional */
     public MedicalProfessional getProfessional() { return professional; }
 
@@ -51,7 +67,7 @@ public final class Appointment implements Comparable<Appointment> {
     @Override
     public int compareTo(Appointment other) {
         int result = date.compareTo(other.date);
-        if (result == 0) { result = time.compareTo(other.time); }
+        if (result == 0) { result = Integer.compare(timeSlotMinutes, other.timeSlotMinutes); }
         if (result == 0) { result = professional.getId().compareTo(other.professional.getId()); }
         return result;
     }
@@ -59,17 +75,17 @@ public final class Appointment implements Comparable<Appointment> {
     /** @return readable booking details including the professional's full details */
     @Override
     public String toString() {
-        return date + " " + time + " | Patient: " + patientName + " | Phone: "
-                + patientPhone + " | " + professional;
+        return date + " " + ClinicSchedule.formatTime(timeSlotMinutes) + " | " + patient + " | " + professional;
     }
 
     /** Rejects invalid intervals and sub-minute times rather than rounding them. */
     static void validateTime(LocalTime time) {
-        if (time == null || time.isBefore(LocalTime.of(8, 0))
-                || !time.isBefore(LocalTime.of(16, 0))
-                || time.getMinute() % 30 != 0 || time.getSecond() != 0
+        if (time == null || !ClinicSchedule.isValidSlot(time.getHour() * 60 + time.getMinute())
+                || time.getSecond() != 0
                 || time.getNano() != 0) {
-            throw new IllegalArgumentException("Use a 30-minute slot from 08:00 to 15:30; closes at 16:00.");
+            throw new IllegalArgumentException("Use a " + ClinicSchedule.SLOT_MINUTES
+                    + "-minute slot from " + ClinicSchedule.formatTime(ClinicSchedule.OPENING_MINUTES)
+                    + "; closing time is " + ClinicSchedule.formatTime(ClinicSchedule.CLOSING_MINUTES) + ".");
         }
     }
 

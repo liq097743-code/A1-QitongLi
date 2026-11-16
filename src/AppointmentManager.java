@@ -1,6 +1,8 @@
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /** Manages one day's bookings with array storage and clear operation feedback. */
 public final class AppointmentManager {
@@ -9,13 +11,7 @@ public final class AppointmentManager {
     private int size;
 
     /** Creates a manager for today's appointments. */
-    public AppointmentManager() { this(LocalDate.now()); }
-
-    /** Allows deterministic tests against a single fixed day. */
-    AppointmentManager(LocalDate serviceDate) {
-        if (serviceDate == null) { throw new IllegalArgumentException("Service date is required."); }
-        this.serviceDate = serviceDate;
-    }
+    public AppointmentManager() { this.serviceDate = LocalDate.now(); }
 
     /** @return the one day managed by this instance */
     public LocalDate getServiceDate() { return serviceDate; }
@@ -27,7 +23,7 @@ public final class AppointmentManager {
      */
     public boolean add(Appointment appointment) {
         if (appointment == null) { return failure("Appointment is required."); }
-        if (!serviceDate.equals(appointment.getDate())) {
+        if (!serviceDate.equals(LocalDate.now()) || !serviceDate.equals(appointment.getDate())) {
             return failure("Only appointments for " + serviceDate + " are accepted.");
         }
         for (int i = 0; i < size; i++) {
@@ -50,17 +46,23 @@ public final class AppointmentManager {
     public Appointment[] getAll() { return sortedCopy(Arrays.copyOf(appointments, size)); }
 
     /** @param staffId digit-only professional ID
-     * @return chronological matching bookings
-     * @throws IllegalArgumentException if the ID is invalid */
+     * @return chronological matches, or an empty array after an invalid-input warning */
     public Appointment[] findByStaffId(String staffId) {
-        return filter(MedicalProfessional.normalizeId(staffId), true);
+        try { return filter(MedicalProfessional.normalizeId(staffId), true); }
+        catch (IllegalArgumentException exception) {
+            failure(exception.getMessage());
+            return new Appointment[0];
+        }
     }
 
     /** @param phone patient's phone
-     * @return chronological matching bookings
-     * @throws IllegalArgumentException if the phone is invalid */
+     * @return chronological matches, or an empty array after an invalid-input warning */
     public Appointment[] findByPatientPhone(String phone) {
-        return filter(Appointment.validatePhone(phone), false);
+        try { return filter(Appointment.validatePhone(phone), false); }
+        catch (IllegalArgumentException exception) {
+            failure(exception.getMessage());
+            return new Appointment[0];
+        }
     }
 
     /**
@@ -114,18 +116,10 @@ public final class AppointmentManager {
     }
 
     private static Appointment[] sortedCopy(Appointment[] source) {
-        Appointment[] result = source.clone();
-        // Insertion sort keeps the introductory implementation explicit and readable.
-        for (int i = 1; i < result.length; i++) {
-            Appointment current = result[i];
-            int j = i - 1;
-            while (j >= 0 && result[j].compareTo(current) > 0) {
-                result[j + 1] = result[j];
-                j--;
-            }
-            result[j + 1] = current;
-        }
-        return result;
+        // Sort an independent list so queries never rearrange internal storage.
+        ArrayList<Appointment> result = new ArrayList<>(Arrays.asList(source));
+        Collections.sort(result);
+        return result.toArray(new Appointment[0]);
     }
 
     private void removeAt(int index) {

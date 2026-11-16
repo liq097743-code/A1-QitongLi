@@ -19,8 +19,13 @@ public final class AssignmentOne {
         MedicalProfessional dentist = new Dentist("102", "Sam Lee", days, "Orthodontics");
         MedicalProfessional physio = new Physiotherapist("103", "Robin Tan", days, "Sports rehabilitation");
         MedicalProfessional nurse = new Nurse("104", "Jamie Wu", days, "Registered nurse");
-        MedicalProfessional[] staff = {gp, dentist, physio, nurse};
-        System.out.println("Created " + staff.length + " types of clinical staff.");
+        MedicalProfessional secondGp = new GeneralPractitioner("106", "Chris Wong",
+                new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY},
+                "Preventive care");
+        MedicalProfessional thirdGp = new GeneralPractitioner("107", "Dana Lin",
+                new DayOfWeek[]{DayOfWeek.TUESDAY, DayOfWeek.THURSDAY}, "Chronic care");
+        MedicalProfessional[] staff = {gp, secondGp, thirdGp, dentist, physio, nurse};
+        System.out.println("Created " + staff.length + " staff members across four clinical roles.");
 
         // Part 3: one base-type loop invokes each subclass's clinical details.
         System.out.println("\nPART 3 - Polymorphic staff display");
@@ -30,10 +35,11 @@ public final class AssignmentOne {
         System.out.println("\nPART 4 - Create appointments for today");
         AppointmentManager manager = new AppointmentManager();
         LocalDate today = manager.getServiceDate();
+        Patient taylor = new Patient("Taylor", "0400000001");
         Appointment[] bookings = {
-            new Appointment("Taylor", "0400000001", today, LocalTime.of(14, 0), gp),
+            new Appointment(taylor, today, LocalTime.of(14, 0), gp),
             new Appointment("Morgan", "0400000002", today, LocalTime.of(8, 0), dentist),
-            new Appointment("Taylor", "0400000001", today, LocalTime.of(9, 0), gp),
+            new Appointment(taylor, today, LocalTime.of(9, 0), gp),
             new Appointment("Casey", "0400000003", today, LocalTime.of(8, 0), physio),
             new Appointment("Jordan", "0400000004", today, LocalTime.of(15, 30), nurse)
         };
@@ -59,6 +65,13 @@ public final class AssignmentOne {
         manager.add(null);
         manager.cancelByStaffAndTime("999", LocalTime.of(10, 0));
         manager.cancelByPatientPhone("0499999999");
+        display("Invalid staff filter", manager.findByStaffId("abc"));
+        display("Invalid patient filter", manager.findByPatientPhone("abc"));
+        MedicalProfessional offDuty = new Nurse("105", "Pat Green",
+                new DayOfWeek[]{today.plusDays(1).getDayOfWeek()}, "Community nursing");
+        System.out.println("Different weekly schedule: " + offDuty);
+        try { new Appointment(taylor, today, LocalTime.of(10, 0), offDuty); }
+        catch (IllegalArgumentException exception) { System.out.println("WARNING: " + exception.getMessage()); }
         try { new Appointment("", "0400000006", today, LocalTime.of(10, 0), gp); }
         catch (IllegalArgumentException exception) { System.out.println("WARNING: " + exception.getMessage()); }
         try { new Appointment("Invalid time", "0400000006", today, LocalTime.of(16, 0), gp); }

@@ -9,16 +9,33 @@ public final class AppointmentSystemTest {
 
     /** @param args unused */
     public static void main(String[] args) {
-        LocalDate day = LocalDate.of(2026, 11, 9); // A fixed Monday makes tests reproducible.
-        DayOfWeek[] schedule = {DayOfWeek.MONDAY, DayOfWeek.TUESDAY};
+        LocalDate day = LocalDate.now(); // Use the same current-day boundary as the production manager.
+        DayOfWeek[] schedule = {day.getDayOfWeek(), day.plusDays(1).getDayOfWeek()};
         MedicalProfessional gp = new GeneralPractitioner("001", "Doctor", schedule, "Family medicine");
         MedicalProfessional duplicate = new GeneralPractitioner("1", "Doctor", schedule, "Family medicine");
         MedicalProfessional dentist = new Dentist("2", "Dentist", schedule, "Restorative dentistry");
         check(gp.equals(duplicate) && gp.hashCode() == duplicate.hashCode(), "Numeric identity");
-        schedule[0] = DayOfWeek.FRIDAY;
-        gp.getWorkingDays()[0] = DayOfWeek.FRIDAY;
-        check(gp.worksOn(DayOfWeek.MONDAY) && !gp.worksOn(DayOfWeek.FRIDAY), "Defensive schedule copies");
-        AppointmentManager manager = new AppointmentManager(day);
+        schedule[0] = day.plusDays(2).getDayOfWeek();
+        gp.getWorkingDays()[0] = day.plusDays(2).getDayOfWeek();
+        check(gp.worksOn(day.getDayOfWeek()) && !gp.worksOn(day.plusDays(2).getDayOfWeek()), "Defensive schedule copies");
+        AppointmentManager manager = new AppointmentManager();
+        Patient patient = new Patient("Original", "0400000001");
+        Appointment protectedBooking = new Appointment(patient, day, LocalTime.of(8, 0), gp);
+        patient.setName("Changed");
+        patient.setMobilePhone("0400000002");
+        check(protectedBooking.getPatientName().equals("Original"), "Patient input snapshot");
+        check(protectedBooking.getPatientPhone().equals("0400000001"), "Phone input snapshot");
+        protectedBooking.getPatient().setMobilePhone("0400000003");
+        check(protectedBooking.getPatientPhone().equals("0400000001"), "Patient output snapshot");
+        try { patient.setName(" "); throw new AssertionError("Expected invalid name"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        check(patient.getName().equals("Changed"), "Invalid setter preserves previous name");
+        try { patient.setMobilePhone("abc"); throw new AssertionError("Expected invalid phone"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        check(patient.getMobilePhone().equals("0400000002"), "Invalid setter preserves previous phone");
+        check(protectedBooking.getTimeSlotMinutes() == 480, "Numeric slot storage");
+        check(manager.findByStaffId("abc").length == 0, "Invalid staff filter handled");
+        check(manager.findByPatientPhone("abc").length == 0, "Invalid patient filter handled");
         check(manager.add(booking(gp, day, 14, 0)), "Add late booking");
         check(manager.add(booking(gp, day, 8, 0)), "Add opening slot");
         check(!manager.add(booking(duplicate, day, 8, 0)), "Reject same ID via different object");
@@ -40,22 +57,38 @@ public final class AppointmentSystemTest {
         check(manager.getAll().length == 0, "All removed");
         check(manager.cancelByPatientPhone("0400000001") == 0, "Missing phone feedback");
         check(!manager.cancelByStaffAndTime("bad", LocalTime.of(8, 0)), "Invalid cancellation ID");
-        invalid(() -> booking(gp, day, 7, 30));
-        invalid(() -> booking(gp, day, 16, 0));
-        invalid(() -> booking(gp, day, 8, 15));
-        invalid(() -> new Appointment("A", "0400000001", day, LocalTime.of(8, 0, 1), gp));
-        invalid(() -> new Appointment("A", "0400000001", day, LocalTime.of(8, 0, 0, 1), gp));
-        invalid(() -> new Appointment(" ", "0400000001", day, LocalTime.of(8, 0), gp));
-        invalid(() -> new Appointment("A", "invalid", day, LocalTime.of(8, 0), gp));
-        invalid(() -> new Appointment("A", "0400000001", day, null, gp));
-        invalid(() -> new Appointment("A", "0400000001", null, LocalTime.of(8, 0), gp));
-        invalid(() -> new Appointment("A", "0400000001", day, LocalTime.of(8, 0), null));
-        invalid(() -> booking(gp, day.plusDays(2), 8, 0));
-        invalid(() -> new Nurse("x", "N", DayOfWeek.values(), "RN"));
-        invalid(() -> new Nurse("3", "N", new DayOfWeek[0], "RN"));
-        invalid(() -> new Nurse("3", "N", new DayOfWeek[]{null}, "RN"));
-        invalid(() -> new Nurse("3", "N", new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.MONDAY}, "RN"));
-        invalid(() -> new Nurse("3", "N", DayOfWeek.values(), ""));
+        try { booking(gp, day, 7, 30); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { booking(gp, day, 16, 0); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { booking(gp, day, 8, 15); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Appointment("A", "0400000001", day, LocalTime.of(8, 0, 1), gp); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Appointment("A", "0400000001", day, LocalTime.of(8, 0, 0, 1), gp); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Appointment(" ", "0400000001", day, LocalTime.of(8, 0), gp); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Appointment("A", "invalid", day, LocalTime.of(8, 0), gp); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Appointment("A", "0400000001", day, null, gp); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Appointment("A", "0400000001", null, LocalTime.of(8, 0), gp); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Appointment("A", "0400000001", day, LocalTime.of(8, 0), null); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { booking(gp, day.plusDays(2), 8, 0); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Nurse("x", "N", DayOfWeek.values(), "RN"); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Nurse("3", "N", new DayOfWeek[0], "RN"); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Nurse("3", "N", new DayOfWeek[]{null}, "RN"); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Nurse("3", "N", new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.MONDAY}, "RN"); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
+        try { new Nurse("3", "N", DayOfWeek.values(), ""); throw new AssertionError("Expected invalid input rejection"); }
+        catch (IllegalArgumentException expected) { checks++; }
         // Exceed initial array capacity and check all sixteen valid daily slots survive.
         for (int i = 15; i >= 0; i--) {
             check(manager.add(booking(gp, day, 8 + i / 2, (i % 2) * 30)), "Array growth booking " + i);
@@ -74,12 +107,6 @@ public final class AppointmentSystemTest {
         for (int i = 1; i < bookings.length; i++) {
             check(bookings[i - 1].getTime().compareTo(bookings[i].getTime()) <= 0, "Chronological order");
         }
-    }
-
-    private static void invalid(Runnable action) {
-        try { action.run(); }
-        catch (IllegalArgumentException expected) { checks++; return; }
-        throw new AssertionError("Expected invalid input to be rejected");
     }
 
     private static void check(boolean condition, String label) {
